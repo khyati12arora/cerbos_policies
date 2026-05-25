@@ -12,9 +12,9 @@ resourcePolicy:
         match:
           all:
             of:
-              - expr: request.principal.attr.httpMethod == "GET"
-              - expr: request.principal.attr.route.startsWith("/users/")
-              - expr: request.principal.attr.role in ["viewer", "editor", "admin"]
+              - expr: string(request.principal.attr.httpMethod) == "GET"
+              - expr: string(request.principal.attr.route).startsWith("/users/")
+              - expr: string(request.principal.attr.role) in ["viewer", "editor", "admin"]
 
     - actions: ["access"]
       effect: EFFECT_ALLOW
@@ -23,9 +23,9 @@ resourcePolicy:
         match:
           all:
             of:
-              - expr: request.principal.attr.httpMethod in ["POST", "PUT"]
-              - expr: request.principal.attr.route.startsWith("/users/")
-              - expr: request.principal.attr.role in ["editor", "admin"]
+              - expr: string(request.principal.attr.httpMethod) in ["POST", "PUT"]
+              - expr: string(request.principal.attr.route).startsWith("/users/")
+              - expr: string(request.principal.attr.role) in ["editor", "admin"]
 
     - actions: ["access"]
       effect: EFFECT_ALLOW
@@ -34,9 +34,9 @@ resourcePolicy:
         match:
           all:
             of:
-              - expr: request.principal.attr.httpMethod == "DELETE"
-              - expr: request.principal.attr.route.startsWith("/users/")
-              - expr: request.principal.attr.role == "admin"
+              - expr: string(request.principal.attr.httpMethod) == "DELETE"
+              - expr: string(request.principal.attr.route).startsWith("/users/")
+              - expr: string(request.principal.attr.role) == "admin"
 
     - actions: ["access"]
       effect: EFFECT_ALLOW
@@ -45,7 +45,7 @@ resourcePolicy:
         match:
           all:
             of:
-              - expr: request.principal.attr.httpMethod in ["GET", "PUT"]
-              - expr: request.principal.attr.route.startsWith("/users/")
-              - expr: request.principal.attr.role == "viewer"
-              - expr: request.resource.attr.ownerId == request.principal.attr.userId
+              - expr: string(request.principal.attr.httpMethod) in ["GET", "PUT"]
+              - expr: string(request.principal.attr.route).startsWith("/users/")
+              - expr: string(request.principal.attr.role) == "viewer"
+              - expr: string(request.resource.attr.ownerId) == string(request.principal.attr.userId)
