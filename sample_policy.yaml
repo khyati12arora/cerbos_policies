@@ -5,33 +5,47 @@ resourcePolicy:
   resource: resource
   scope: "acme"
   rules:
-    - actions: ["GET /users/*"]
-      effect: EFFECT_ALLOW
-      roles: ["*"]
-      condition:
-        match:
-          expr: request.principal.attr.role in ["viewer", "editor", "admin"]
-
-    - actions: ["POST /users/*", "PUT /users/*"]
-      effect: EFFECT_ALLOW
-      roles: ["*"]
-      condition:
-        match:
-          expr: request.principal.attr.role in ["editor", "admin"]
-
-    - actions: ["DELETE /users/*"]
-      effect: EFFECT_ALLOW
-      roles: ["*"]
-      condition:
-        match:
-          expr: request.principal.attr.role == "admin"
-
-    - actions: ["GET /users/*", "PUT /users/*"]
+    - actions: ["access"]
       effect: EFFECT_ALLOW
       roles: ["*"]
       condition:
         match:
           all:
             of:
+              - expr: request.principal.attr.httpMethod == "GET"
+              - expr: request.principal.attr.route.startsWith("/users/")
+              - expr: request.principal.attr.role in ["viewer", "editor", "admin"]
+
+    - actions: ["access"]
+      effect: EFFECT_ALLOW
+      roles: ["*"]
+      condition:
+        match:
+          all:
+            of:
+              - expr: request.principal.attr.httpMethod in ["POST", "PUT"]
+              - expr: request.principal.attr.route.startsWith("/users/")
+              - expr: request.principal.attr.role in ["editor", "admin"]
+
+    - actions: ["access"]
+      effect: EFFECT_ALLOW
+      roles: ["*"]
+      condition:
+        match:
+          all:
+            of:
+              - expr: request.principal.attr.httpMethod == "DELETE"
+              - expr: request.principal.attr.route.startsWith("/users/")
+              - expr: request.principal.attr.role == "admin"
+
+    - actions: ["access"]
+      effect: EFFECT_ALLOW
+      roles: ["*"]
+      condition:
+        match:
+          all:
+            of:
+              - expr: request.principal.attr.httpMethod in ["GET", "PUT"]
+              - expr: request.principal.attr.route.startsWith("/users/")
               - expr: request.principal.attr.role == "viewer"
               - expr: request.resource.attr.ownerId == request.principal.attr.userId
