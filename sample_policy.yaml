@@ -12,9 +12,12 @@ resourcePolicy:
         match:
           all:
             of:
-              - expr: string(request.principal.attr.httpMethod) == "GET"
-              - expr: string(request.principal.attr.route).startsWith("/users/")
-              - expr: string(request.principal.attr.role) in ["viewer", "editor", "admin"]
+              - expr: request.principal.attr.httpMethod == "GET"
+              - expr: request.principal.attr.route.startsWith("/users/")
+              - expr: >
+                  request.principal.attr.role == "viewer" ||
+                  request.principal.attr.role == "editor" ||
+                  request.principal.attr.role == "admin"
 
     - actions: ["access"]
       effect: EFFECT_ALLOW
@@ -23,9 +26,13 @@ resourcePolicy:
         match:
           all:
             of:
-              - expr: string(request.principal.attr.httpMethod) in ["POST", "PUT"]
-              - expr: string(request.principal.attr.route).startsWith("/users/")
-              - expr: string(request.principal.attr.role) in ["editor", "admin"]
+              - expr: >
+                  request.principal.attr.httpMethod == "POST" ||
+                  request.principal.attr.httpMethod == "PUT"
+              - expr: request.principal.attr.route.startsWith("/users/")
+              - expr: >
+                  request.principal.attr.role == "editor" ||
+                  request.principal.attr.role == "admin"
 
     - actions: ["access"]
       effect: EFFECT_ALLOW
@@ -34,9 +41,9 @@ resourcePolicy:
         match:
           all:
             of:
-              - expr: string(request.principal.attr.httpMethod) == "DELETE"
-              - expr: string(request.principal.attr.route).startsWith("/users/")
-              - expr: string(request.principal.attr.role) == "admin"
+              - expr: request.principal.attr.httpMethod == "DELETE"
+              - expr: request.principal.attr.route.startsWith("/users/")
+              - expr: request.principal.attr.role == "admin"
 
     - actions: ["access"]
       effect: EFFECT_ALLOW
@@ -45,7 +52,9 @@ resourcePolicy:
         match:
           all:
             of:
-              - expr: string(request.principal.attr.httpMethod) in ["GET", "PUT"]
-              - expr: string(request.principal.attr.route).startsWith("/users/")
-              - expr: string(request.principal.attr.role) == "viewer"
-              - expr: string(request.resource.attr.ownerId) == string(request.principal.attr.userId)
+              - expr: >
+                  request.principal.attr.httpMethod == "GET" ||
+                  request.principal.attr.httpMethod == "PUT"
+              - expr: request.principal.attr.route.startsWith("/users/")
+              - expr: request.principal.attr.role == "viewer"
+              - expr: request.resource.attr.ownerId == request.principal.attr.userId
