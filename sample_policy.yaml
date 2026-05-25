@@ -2,30 +2,35 @@
 apiVersion: api.cerbos.dev/v1
 resourcePolicy:
   version: "default"
-  resource: document
+  resource: resource
   rules:
     - actions: ["read"]
       effect: EFFECT_ALLOW
-      roles:
-        - viewer
-        - editor
-        - admin
+      roles: ["*"]
+      condition:
+        match:
+          expr: request.principal.attr.role in ["viewer", "editor", "admin"]
 
     - actions: ["create", "update"]
       effect: EFFECT_ALLOW
-      roles:
-        - editor
-        - admin
+      roles: ["*"]
+      condition:
+        match:
+          expr: request.principal.attr.role in ["editor", "admin"]
 
     - actions: ["delete"]
       effect: EFFECT_ALLOW
-      roles:
-        - admin
+      roles: ["*"]
+      condition:
+        match:
+          expr: request.principal.attr.role == "admin"
 
     - actions: ["read", "update"]
       effect: EFFECT_ALLOW
-      roles:
-        - viewer
+      roles: ["*"]
       condition:
         match:
-          expr: request.resource.attr.ownerId == request.principal.id
+          all:
+            of:
+              - expr: request.principal.attr.role == "viewer"
+              - expr: request.resource.attr.ownerId == request.principal.attr.userId
